@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: customers
+    // Fields: name, phone, whatsapp, city, created_at, archived, payment_status, customer_notes, status
+    //
+    // Collection: vehicles
+    // Fields: customer_id, car_type, brand, model, year, plate_number, chassis_number, insurance_image_url, stamp_image_url, inspection_image_url
+    //
+    // Collection: policies
+    // Fields: vehicle_id, price, office_commission, admin_profit, expiry_date, status, payment_status
+    //
+    // Collection: offices
+    // Fields: office_name, city, subscription_expiry, QR_code_url
+    //
+    // ===============================================================
+
+    // Helper functions
+    function isAuthenticated() {
+      return true; // --- DEVELOPMENT BYPASS ---
+    }
+
+    function isAdmin() {
+      return true; // --- DEVELOPMENT BYPASS ---
+    }
+
+    function isValidCustomer(data) {
+      return data.keys().hasAll(['name', 'phone', 'whatsapp', 'city', 'status', 'payment_status']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.phone is string && data.phone.size() > 0 && data.phone.size() < 20 &&
+             data.whatsapp is string && data.whatsapp.size() > 0 && data.whatsapp.size() < 20 &&
+             data.city is string && data.city.size() > 0 && data.city.size() < 50 &&
+             data.status in ["تم التواصل", "تم الرد", "تم التجديد", "لم يتم الرد", "تم الرفض"] &&
+             data.payment_status in ["paid", "unpaid"];
+    }
+
+    function isValidVehicle(data) {
+      return data.keys().hasAll(['customer_id', 'car_type', 'brand', 'model', 'year', 'plate_number', 'chassis_number']) &&
+             data.customer_id is string &&
+             data.car_type is string &&
+             data.brand is string &&
+             data.model is string &&
+             data.year is string &&
+             data.plate_number is string &&
+             data.chassis_number is string;
+    }
+
+    function isValidPolicy(data) {
+      return data.keys().hasAll(['vehicle_id', 'price', 'office_commission', 'admin_profit', 'expiry_date', 'status', 'payment_status']) &&
+             data.vehicle_id is string &&
+             data.price is number &&
+             data.office_commission is number &&
+             data.admin_profit is number &&
+             data.expiry_date is timestamp &&
+             data.status in ["active", "expired", "renewed"] &&
+             data.payment_status in ["paid", "unpaid"];
+    }
+
+    match /customers/{customerId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isValidCustomer(request.resource.data);
+    }
+
+    match /vehicles/{vehicleId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isValidVehicle(request.resource.data);
+    }
+
+    match /policies/{policyId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isValidPolicy(request.resource.data);
+    }
+
+    match /offices/{officeId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

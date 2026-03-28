@@ -1,0 +1,72 @@
+{
+  "entities": {
+    "Customer": {
+      "title": "Customer",
+      "description": "Represents a customer in the Anis Reminder System.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The customer's full name." },
+        "phone": { "type": "string", "description": "The customer's phone number." },
+        "whatsapp": { "type": "string", "description": "The customer's WhatsApp number." },
+        "city": { "type": "string", "description": "The customer's city." },
+        "created_at": { "type": "string", "format": "date-time", "description": "When the customer was created." },
+        "archived": { "type": "boolean", "description": "Whether the customer is archived." },
+        "payment_status": { "type": "string", "enum": ["paid", "unpaid"], "description": "The customer's payment status." },
+        "customer_notes": { "type": "string", "description": "Additional notes about the customer." },
+        "status": { "type": "string", "enum": ["تم التواصل", "تم الرد", "تم التجديد", "لم يتم الرد", "تم الرفض"], "description": "The customer's interaction status." }
+      },
+      "required": ["name", "phone", "whatsapp", "city", "payment_status", "status"]
+    },
+    "Vehicle": {
+      "title": "Vehicle",
+      "description": "Represents a vehicle owned by a customer.",
+      "type": "object",
+      "properties": {
+        "customer_id": { "type": "string", "description": "Reference to the customer's ID." },
+        "car_type": { "type": "string", "description": "The type of car (e.g., Sedan, SUV)." },
+        "brand": { "type": "string", "description": "The car's brand." },
+        "model": { "type": "string", "description": "The car's model." },
+        "year": { "type": "string", "description": "The car's manufacturing year." },
+        "plate_number": { "type": "string", "description": "The car's plate number." },
+        "chassis_number": { "type": "string", "description": "The car's chassis number." },
+        "insurance_image_url": { "type": "string", "description": "URL to the insurance image." },
+        "stamp_image_url": { "type": "string", "description": "URL to the stamp image." },
+        "inspection_image_url": { "type": "string", "description": "URL to the inspection image." }
+      },
+      "required": ["customer_id", "car_type", "brand", "model", "year", "plate_number", "chassis_number"]
+    },
+    "Policy": {
+      "title": "Policy",
+      "description": "Represents an insurance policy for a vehicle.",
+      "type": "object",
+      "properties": {
+        "vehicle_id": { "type": "string", "description": "Reference to the vehicle's ID." },
+        "price": { "type": "number", "description": "The price of the policy." },
+        "office_commission": { "type": "number", "description": "The office's commission." },
+        "admin_profit": { "type": "number", "description": "The admin's profit." },
+        "expiry_date": { "type": "string", "format": "date-time", "description": "When the policy expires." },
+        "status": { "type": "string", "enum": ["active", "expired", "renewed"], "description": "The policy's status." },
+        "payment_status": { "type": "string", "enum": ["paid", "unpaid"], "description": "The policy's payment status." }
+      },
+      "required": ["vehicle_id", "price", "office_commission", "admin_profit", "expiry_date", "status", "payment_status"]
+    },
+    "Office": {
+      "title": "Office",
+      "description": "Represents an office using the system.",
+      "type": "object",
+      "properties": {
+        "office_name": { "type": "string", "description": "The office's name." },
+        "city": { "type": "string", "description": "The office's city." },
+        "subscription_expiry": { "type": "string", "format": "date-time", "description": "When the office's subscription expires." },
+        "QR_code_url": { "type": "string", "description": "URL to the office's QR code." }
+      },
+      "required": ["office_name", "city", "subscription_expiry"]
+    }
+  },
+  "firestore": {
+    "/customers/{customerId}": { "schema": "Customer", "description": "Collection of customers." },
+    "/vehicles/{vehicleId}": { "schema": "Vehicle", "description": "Collection of vehicles." },
+    "/policies/{policyId}": { "schema": "Policy", "description": "Collection of policies." },
+    "/offices/{officeId}": { "schema": "Office", "description": "Collection of offices." }
+  }
+}
